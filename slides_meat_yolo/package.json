@@ -1,0 +1,18 @@
+{
+  "name": "slides_meat_yolo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build_meat_yolo_slides.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "fontkit": "^2.0.4",
+    "linebreak": "^1.1.0",
+    "pptxgenjs": "^4.0.1",
+    "skia-canvas": "^3.0.8"
+  }
+}
