@@ -61,6 +61,8 @@ const ASSET = {
   lamb: "../detect_results/predict/IMG_2571_jpg.rf.ede6c052f742170fc837e6c3e2b0ed39.jpg",
   lamb2: "../detect_results/predict/istockphoto-1300699678-612x612_jpg.rf.40f23d801c52831b734920aeb4ea53c2.jpg",
   hard: "../detect_results/predict/pngtree-red-meat-on-a-white-cut-out-picture-image_13276259_png.rf.b5d2f746cfb72290f0109194277ae8b2.jpg",
+  overlap: "../detect_results/predict/IMG_2531_jpg.rf.f79a1b88fc9ef9a5564c42be115c7bb8.jpg",
+  overlapPork: "../detect_results/predict/Screenshot-2025-04-02-234238_png.rf.f6aab08a21fe6901ec6b99459aaae9c8.jpg",
 };
 
 const metrics = [
@@ -329,13 +331,30 @@ function titleSlide() {
   chip(slide, "YOLO11s", 0.66, 4.28, 1.25, COLORS.wine);
   chip(slide, "Roboflow", 2.08, 4.28, 1.38, COLORS.teal);
   chip(slide, "Object Detection", 3.63, 4.28, 1.92, COLORS.blue);
-  text(slide, "Programming 1 Project", {
+  text(slide, "応用プログラミング", {
     x: 0.66,
-    y: 6.72,
-    w: 2.4,
+    y: 6.52,
+    w: 2.35,
     h: 0.18,
     fontSize: 9.2,
     color: "BFB3AA",
+  });
+  text(slide, "2026年6月1日 13:11", {
+    x: 0.66,
+    y: 6.78,
+    w: 2.35,
+    h: 0.18,
+    fontSize: 8.8,
+    color: "BFB3AA",
+  });
+  text(slide, "03250910阿部壮一郎", {
+    x: 3.52,
+    y: 6.65,
+    w: 1.87,
+    h: 0.18,
+    fontSize: 8.8,
+    color: "BFB3AA",
+    align: "right",
   });
   addPage(slide, 1);
 }
@@ -405,7 +424,7 @@ function agendaSlide() {
 function backgroundSlide() {
   const slide = pptx.addSlide("blank");
   header(slide, "1章 はじめに", "開発の背景", 3);
-  fitText(slide, "肉の種類は目視で判断されるが、画像上の見え方は安定しない", {
+  fitText(slide, "自動調理では、食材を見分けて調理条件を変える必要がある", {
     x: 0.72,
     y: 1.52,
     w: 6.8,
@@ -415,7 +434,7 @@ function backgroundSlide() {
     minFontSize: 16,
     bold: true,
   });
-  text(slide, "食品管理、食材分類、料理記録では、画像から肉種を自動判定できると有用である。", {
+  text(slide, "肉の種類を画像から判定できれば、加熱時間や火力、調理手順を機械が選ぶための入力として使える。", {
     x: 0.74,
     y: 2.42,
     w: 5.7,
@@ -424,9 +443,9 @@ function backgroundSlide() {
     color: COLORS.muted,
   });
   const themes = [
-    ["色", "照明で赤みや白さが変わる", COLORS.wine],
-    ["脂身", "部位や切り方で分布が変わる", COLORS.amber],
-    ["形状", "一部だけ写ると特徴が減る", COLORS.teal],
+    ["肉種", "牛・豚・鶏・羊で適した加熱条件が異なる", COLORS.wine],
+    ["状態", "部位や切り方で火の通り方が変わる", COLORS.amber],
+    ["見え方", "照明や重なりで画像特徴が揺れる", COLORS.teal],
   ];
   themes.forEach((t, i) => {
     const x = 0.78 + i * 2.17;
@@ -450,7 +469,7 @@ function backgroundSlide() {
   });
   addImageCrop(slide, ASSET.cover, 8.0, 1.42, 4.55, 4.6, [0.2, 0.08, 0.58, 0.7]);
   sectionLabel(slide, "Problem", 8.0, 6.28, 1.25, COLORS.wine);
-  text(slide, "人の判断が揺れる条件は、モデルの判断も揺らす", {
+  text(slide, "調理判断の前段として、肉種を安定して検出する必要がある", {
     x: 9.45,
     y: 6.3,
     w: 3.0,
@@ -525,30 +544,80 @@ function relatedWorkSlide() {
 function challengesSlide() {
   const slide = pptx.addSlide("blank");
   header(slide, "1章 はじめに", "肉画像認識の課題", 5);
-  addImageCrop(slide, ASSET.lamb2, 0.74, 1.45, 3.15, 3.15);
-  addImageCrop(slide, ASSET.pork, 4.1, 1.45, 3.15, 3.15);
-  rect(slide, 0.74, 4.88, 6.5, 0.07, COLORS.wine);
-  text(slide, "似ている見た目が、誤分類の原因になる", {
-    x: 0.78,
-    y: 5.22,
-    w: 5.85,
+  text(slide, "現在は2つの難所を分けて扱うため、追加データで学習を進めている", {
+    x: 0.76,
+    y: 1.45,
+    w: 8.8,
     h: 0.3,
-    fontSize: 22,
+    fontSize: 21,
     bold: true,
   });
-  bulletBox(slide, [
-    "色や脂身が似るクラスがある",
-    "同じクラスでも部位や切り方で変化する",
-    "背景、トレー、包装を手がかりにするリスクがある",
-    "画像枚数が少ないと撮影条件に過学習しやすい",
-  ], 7.85, 1.52, 4.8, 3.45, { fontSize: 15.2, paraSpaceAfterPt: 12 });
-  sectionLabel(slide, "Key issue", 7.85, 5.23, 1.5, COLORS.teal);
-  text(slide, "モデル性能だけでなく、データの作り方が精度を左右する", {
-    x: 9.58,
-    y: 5.24,
-    w: 3.0,
-    h: 0.28,
-    fontSize: 12.2,
+
+  const tasks = [
+    {
+      no: "課題1",
+      title: "背景の差",
+      body: "皿、まな板、白背景などの撮影条件に引っ張られず、肉そのものの特徴で判定する。",
+      image: ASSET.hard,
+      label: "背景・切り抜き条件が異なる例",
+      color: COLORS.wine,
+    },
+    {
+      no: "課題2",
+      title: "肉同士の重なり",
+      body: "複数の肉片が接触・重なっている場合でも、1つずつの領域と種類を分けて検出する。",
+      image: ASSET.overlap,
+      label: "肉同士が重なって見える例",
+      color: COLORS.teal,
+    },
+  ];
+  tasks.forEach((task, i) => {
+    const x = 0.78 + i * 6.12;
+    rect(slide, x, 2.05, 5.46, 3.55, COLORS.offWhite, {
+      line: { color: COLORS.hair, width: 1 },
+    });
+    addImageCrop(slide, task.image, x + 0.26, 2.34, 2.25, 2.25);
+    rect(slide, x + 0.26, 2.34, 2.25, 2.25, COLORS.white, {
+      fill: { color: COLORS.white, transparency: 100 },
+      line: { color: task.color, width: 1.2 },
+    });
+    sectionLabel(slide, task.no, x + 2.85, 2.35, 1.05, task.color);
+    text(slide, task.title, {
+      x: x + 2.85,
+      y: 2.92,
+      w: 2.0,
+      h: 0.24,
+      fontSize: 18,
+      bold: true,
+      color: COLORS.ink,
+    });
+    text(slide, task.body, {
+      x: x + 2.85,
+      y: 3.42,
+      w: 2.15,
+      h: 0.78,
+      fontSize: 10.8,
+      color: COLORS.muted,
+      fit: "shrink",
+    });
+    line(slide, x + 0.26, 4.9, 4.9, 0, task.color, 1.2);
+    text(slide, task.label, {
+      x: x + 0.28,
+      y: 5.12,
+      w: 4.7,
+      h: 0.16,
+      fontSize: 9.2,
+      color: COLORS.muted,
+    });
+  });
+
+  sectionLabel(slide, "Key issue", 0.78, 6.12, 1.5, COLORS.blue);
+  text(slide, "背景に強いモデルから、重なった複数対象も分離できるモデルへ評価範囲を広げる", {
+    x: 2.55,
+    y: 6.13,
+    w: 8.15,
+    h: 0.24,
+    fontSize: 12.4,
     bold: true,
     color: COLORS.ink,
   });
@@ -743,10 +812,11 @@ function roboflowSlide() {
     ["Resize", "画像サイズを640pxに統一", COLORS.blue],
     ["Split", "学習、検証、テストに分割", COLORS.teal],
     ["Augment", "反転、拡大縮小、色変化など", COLORS.wine],
+    ["Add data", "重なりケースを追加して再学習", COLORS.rose],
     ["Export", "YOLO形式で出力", COLORS.amber],
   ];
   rows.forEach((r, i) => {
-    const y = 2.35 + i * 0.82;
+    const y = 2.22 + i * 0.68;
     rect(slide, 0.88, y, 0.16, 0.16, r[2]);
     text(slide, r[0], {
       x: 1.25,
@@ -766,7 +836,7 @@ function roboflowSlide() {
       fontSize: 13.4,
       color: COLORS.ink,
     });
-    line(slide, 0.88, y + 0.42, 5.65, 0, COLORS.hair, 0.7);
+    line(slide, 0.88, y + 0.36, 5.65, 0, COLORS.hair, 0.7);
   });
   rect(slide, 7.35, 1.78, 4.92, 3.95, COLORS.offWhite, {
     line: { color: COLORS.hair, width: 1 },
@@ -781,7 +851,7 @@ function roboflowSlide() {
     color: COLORS.wine,
     charSpace: 1.2,
   });
-  fitText(slide, "肉の見え方が変わる前提で、データセット設計と失敗例分析を重視した", {
+  fitText(slide, "背景差と重なりを分けて検証できるよう、データセット設計と失敗例分析を重視した", {
     x: 7.75,
     y: 2.68,
     w: 4.05,
@@ -792,7 +862,7 @@ function roboflowSlide() {
     bold: true,
     color: COLORS.ink,
   });
-  text(slide, "モデルを新規提案するのではなく、対象に合わせたデータ作成を検証対象にした。", {
+  text(slide, "追加学習では、複数の肉片が接触する画像を増やし、BBoxの分離性能も確認する。", {
     x: 7.78,
     y: 4.38,
     w: 3.95,
@@ -818,7 +888,7 @@ function yoloSlide() {
   });
   const settings = [
     ["model", "yolo11s.pt"],
-    ["epochs", "10"],
+    ["epochs", "100"],
     ["imgsz", "640"],
     ["batch", "16"],
     ["task", "detect"],
@@ -935,21 +1005,23 @@ function resultsSlide() {
 function examplesSlide() {
   const slide = pptx.addSlide("blank");
   header(slide, "3章 結果と考察", "推論例", 12);
-  text(slide, "confidenceが付いた検出枠として出力される", {
+  fitText(slide, "単体では判定できても、重なりでは pork に寄る誤判定が出る", {
     x: 0.78,
     y: 1.42,
     w: 5.8,
     h: 0.28,
     fontSize: 21,
+    maxFontSize: 21,
+    minFontSize: 14,
     bold: true,
   });
-  labeledImage(slide, ASSET.lamb, "lamb 0.81", 0.74, 1.96, 2.72, 2.72, COLORS.teal);
-  labeledImage(slide, ASSET.pork, "pork 0.58", 3.62, 1.96, 2.72, 2.72, COLORS.rose);
-  labeledImage(slide, ASSET.lamb2, "lamb 0.55", 6.5, 1.96, 2.72, 2.72, COLORS.blue);
-  labeledImage(slide, ASSET.hard, "例: 判断が難しい画像", 9.38, 1.96, 2.72, 2.72, COLORS.amber);
+  labeledImage(slide, ASSET.lamb, "単体: lamb 0.81", 0.74, 1.96, 2.72, 2.72, COLORS.teal);
+  labeledImage(slide, ASSET.pork, "単体: pork 0.58", 3.62, 1.96, 2.72, 2.72, COLORS.rose);
+  labeledImage(slide, ASSET.overlapPork, "重なり: pork 0.36 / 0.46", 6.5, 1.96, 2.72, 2.72, COLORS.wine);
+  labeledImage(slide, ASSET.overlap, "重なり: BBoxが不安定", 9.38, 1.96, 2.72, 2.72, COLORS.blue);
   const notes = [
-    ["成功しやすい条件", "肉が大きく、背景が単純で、脂身や色の特徴が見える"],
-    ["難しい条件", "透かし、背景、暗さ、肉同士の類似でconfidenceが下がる"],
+    ["追加した検証", "複数種類の肉が重なっている画像を推論し、BBoxとラベルの出方を確認した"],
+    ["見えた課題", "重なり部分では境界が曖昧になり、pork として誤って検出されやすい"],
   ];
   notes.forEach((n, i) => {
     const x = 1.02 + i * 5.92;
@@ -989,13 +1061,14 @@ function discussionSlide() {
     bold: true,
   });
   const insights = [
-    ["判定できた点", "lambなど特徴が強い画像では正解数が多い"],
-    ["誤りやすい点", "background扱い、pork周辺の混同、検出漏れが発生"],
-    ["新たな発見", "肉そのものだけでなく、背景や撮影条件が結果に影響する"],
+    ["判定できた点", "単体で写る肉や特徴が強い画像では正解数が多い"],
+    ["工夫", "重なった肉がうまく判定されなかったため、重なり画像を学習データに追加"],
+    ["検証", "複数種類の肉が重なる画像を判定させ、BBoxとラベルの出方を確認"],
+    ["残る課題", "重なりケースでは、別の肉も pork と誤って認定されることが多い"],
   ];
   insights.forEach((v, i) => {
-    const y = 2.15 + i * 1.05;
-    rect(slide, 7.05, y, 0.14, 0.14, [COLORS.teal, COLORS.wine, COLORS.blue][i]);
+    const y = 2.06 + i * 0.82;
+    rect(slide, 7.05, y, 0.14, 0.14, [COLORS.teal, COLORS.amber, COLORS.blue, COLORS.wine][i]);
     text(slide, v[0], {
       x: 7.45,
       y: y - 0.05,
@@ -1009,14 +1082,14 @@ function discussionSlide() {
       x: 9.38,
       y: y - 0.04,
       w: 2.85,
-      h: 0.44,
-      fontSize: 10.3,
+      h: 0.36,
+      fontSize: 9.7,
       color: COLORS.muted,
     });
-    line(slide, 7.05, y + 0.56, 5.1, 0, COLORS.hair, 0.7);
+    line(slide, 7.05, y + 0.44, 5.1, 0, COLORS.hair, 0.7);
   });
   sectionLabel(slide, "Takeaway", 7.08, 5.67, 1.35, COLORS.wine);
-  text(slide, "実用化には、モデル改善より先にデータ多様性の確保が重要", {
+  text(slide, "背景差だけでなく、肉同士の重なりを含むデータ多様性が重要", {
     x: 8.62,
     y: 5.68,
     w: 3.62,
@@ -1057,8 +1130,8 @@ function conclusionSlide() {
   });
   const next = [
     ["確認できたこと", "一定条件では肉領域と種類を検出できた"],
-    ["残った課題", "照明、部位、背景が誤分類や検出漏れにつながった"],
-    ["今後", "多様な画像追加、背景条件の比較、他モデルとの比較を行う"],
+    ["課題1", "照明、部位、背景差が誤分類や検出漏れにつながった"],
+    ["課題2", "肉同士が重なるケースの判別に向けて追加学習を進めている"],
   ];
   next.forEach((n, i) => {
     const y = 3.55 + i * 0.76;
@@ -1080,7 +1153,7 @@ function conclusionSlide() {
       color: "D9D0C8",
     });
   });
-  text(slide, "今後は、実際の利用環境でも安定して判定できるモデルを目指す。", {
+  text(slide, "今後は、背景が違っても、肉同士が重なっても安定して判定できるモデルを目指す。", {
     x: 0.72,
     y: 6.45,
     w: 5.45,
